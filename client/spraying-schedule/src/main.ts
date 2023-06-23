@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import router from "./router"
 
 // for tailwind
 import "./assets/index.scss";
@@ -26,6 +27,7 @@ const app = createApp(App);
 app.use(pinia);
 app.use(createPinia);
 app.use(ProCalendar);
+app.use(router);
 app.use(BootstrapVue3)
 app.use(VCalendar)
 app.mount("#app");

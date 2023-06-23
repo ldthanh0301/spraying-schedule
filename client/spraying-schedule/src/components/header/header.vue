@@ -10,9 +10,18 @@
 </template>
 
 <script>
+import { useFarmersStore } from '../../stores/farmers.ts'
+
 export default {
-    setup () {
-        return {}
+  data() {
+    return {
+    //   store: useFarmersStore()
+    }
+    },
+    computed : {
+        showFarmer() {
+            // console.log("farmer: ", this.store.getFarmers)
+        }
     }
 }
 </script>

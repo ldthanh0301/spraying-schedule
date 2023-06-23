@@ -138,6 +138,8 @@ import { DatePicker } from "v-calendar";
 import AddIcon from "./assets/close-icon.vue";
 import CloseIcon from "./assets/close-icon.vue";
 import { useEventsStore } from "../../stores/events";
+import { useFarmersStore } from '../../stores/farmers.ts'
+
 import {useToast} from 'vue-toast-notification';
 const $toast = useToast();
 
@@ -145,6 +147,7 @@ export default {
   data() {
     return {
       store: useEventsStore(),
+      farmers: useFarmersStore(),
       form: {
         name: "",
         address: "",
@@ -161,6 +164,7 @@ export default {
 
   computed: {
     isModalVisible() {
+     
       return this.isOpen;
     },
     dates() {
@@ -179,6 +183,8 @@ export default {
   methods: {
     onToggle() {
       this.isOpen = !this.isOpen;
+      console.log("farmers: ", this.farmers.getFarmers())
+      console.log("farmers2: ", this.farmers.farmers)
     },
     onContext(ctx) {
       this.context = ctx;

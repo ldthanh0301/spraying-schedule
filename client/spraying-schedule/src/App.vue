@@ -63,14 +63,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <Header></Header>
+  <!-- <Header></Header>
   <pro-calendar
     date=""
     :events="evts"
     :config="cfg"
     @calendarClosed="void 0"
     @fetchEvents="void 0"
-  />
+  /> -->
+  <router-view />
 </template>
 
 <style scoped></style>
