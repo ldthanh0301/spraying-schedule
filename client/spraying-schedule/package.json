@@ -48,6 +48,7 @@
     "v-calendar": "3.0.0-alpha.7",
     "vite-plugin-i18n-resources": "^1.0.3",
     "vue": "^3.3.4",
+    "vue-future-slider": "^1.0.5",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.2",
     "vue-toast-notification": "3.0"

@@ -29,15 +29,15 @@
         >
           <div class="single-event-inf">
             <span
-              :data-rdv-date="RdvsPkg[0].date"
+              :data-rdv-date="RdvsPkg[0].spraying_date"
               :title="
-                isoStringToDate(RdvsPkg[0].date).toLocaleString($i18n.locale)
+                isoStringToDate(RdvsPkg[0].spraying_date).toLocaleString($i18n.locale)
               "
               class="block text-left text-09101D font-medium text-xs calendar--event-time"
             >
               {{
                 timeFormat(
-                  `${hours(RdvsPkg[0].date)}:${minutes(RdvsPkg[0].date)}`,
+                  `${hours(RdvsPkg[0].spraying_date)}:${minutes(RdvsPkg[0].spraying_date)}`,
                   true
                 )
               }}
@@ -45,10 +45,10 @@
             </span>
             <div class="font-semibold text-0EA5E9 text-sm leading-4">
               <span
-                :title="RdvsPkg[0]?.comment ?? ''"
+                :title="RdvsPkg[0]?.spraying_comment ?? ''"
                 class="block text-left capitalize truncate calendar--event-name"
               >
-                {{ RdvsPkg[0].name }}
+                {{ RdvsPkg[0].spraying_name }}
               </span>
               <span class="block truncate">
                 <span
@@ -59,7 +59,7 @@
                 <span
                   class="text-left calendar--event-keyword text-A1A1AA font-normal"
                 >
-                  {{ RdvsPkg[0].keywords }}
+                  {{ RdvsPkg[0].spraying_keywords }}
                 </span>
               </span>
             </div>
@@ -92,9 +92,10 @@
         <!-- we use eventList here just to get popupr or popupb -->
         <LinkAction
           v-if="configs?.viewEvent"
-          @clicked="viewEvent(RdvsPkg[0].id)"
+          @clicked="viewEvent(RdvsPkg[0].spraying_id)"
           class="calendar--event-view-action calendar--action"
           :text="configs?.viewEvent?.text || $t('calendar.view')"
+          :spraying_id="RdvsPkg[0].spraying_id"
         >
           <template v-if="configs?.viewEvent?.icon" #icon>
             <BlueEye />
@@ -103,9 +104,10 @@
         <!---->
         <LinkAction
           v-if="configs?.reportEvent"
-          @clicked="reportEventFor(RdvsPkg[0].id)"
+          @clicked="reportEventFor(RdvsPkg[0].spraying_id)"
           :text="configs?.reportEvent?.text || $t('calendar.report')"
           class="calendar--event-report-action calendar--action"
+          :spraying_id="RdvsPkg[0].spraying_id"
         >
           <template v-if="configs?.reportEvent?.icon" #icon>
             <OrangeUpdate />
@@ -137,14 +139,14 @@
               <!--title-->
               <div class="font-semibold text-A1A1AA leading-4 text-0dt688">
                 <span
-                  :data-rdv-date="rdv.date"
+                  :data-rdv-date="rdv.spraying_date"
                   :title="
-                    isoStringToDate(rdv.date).toLocaleString($i18n.locale)
+                    isoStringToDate(rdv.spraying_date).toLocaleString($i18n.locale)
                   "
                   class="calendar--event-time"
                 >
                   {{
-                    timeFormat(`${hours(rdv.date)}:${minutes(rdv.date)}`, true)
+                    timeFormat(`${hours(rdv.spraying_date)}:${minutes(rdv.spraying_date)}`, true)
                   }}
                   <!-- {{ hours(rdv.date) }}:{{ minutes(rdv.date) }} -->
                 </span>
@@ -152,16 +154,16 @@
               <!--name and engin-->
               <div class="font-medium text-xs text-09101D">
                 <span
-                  :title="rdv?.comment ?? ''"
+                  :title="rdv?.spraying_comment ?? ''"
                   class="block capitalize calendar--event-name"
                 >
-                  {{ rdv.name }}
+                  {{ rdv.spraying_name }}
                 </span>
                 <!---->
                 <span
                   class="block text-A1A1AA capitalize truncate calendar--event-keyword"
                 >
-                  {{ rdv.keywords }}
+                  {{ rdv.spraying_keywords }}
                 </span>
               </div>
             </div>
@@ -173,7 +175,8 @@
           >
             <LinkAction
               v-if="configs?.viewEvent"
-              @clicked="viewEvent(rdv.id)"
+              @clicked="viewEvent(rdv.spraying_id)"
+              :spraying_id="rdv.spraying_id"
               :text="configs?.viewEvent?.text || $t('calendar.view')"
               class="calendar--event-view-action calendar--action"
             >
@@ -184,7 +187,8 @@
             <!---->
             <LinkAction
               v-if="configs?.reportEvent"
-              @clicked="reportEventFor(rdv.id)"
+              :spraying_id="rdv.spraying_id"
+              @clicked="reportEventFor(rdv.spraying_id)"
               :text="configs?.reportEvent?.text || $t('calendar.report')"
               class="calendar--event-report-action calendar--action"
             >
@@ -208,8 +212,9 @@ export interface Props {
   eventTime?: string;
   slots: Slots;
 }
-
+import router from "../../router/index.js"
 import { useEventsStore } from "../../stores/events";
+import { useSprayingSchedulesStore } from "../../stores/sprayingSchedules";
 import type { Appointment, Configs } from "../../stores/events";
 import LinkAction from "./assets/link-action.vue";
 import BlueEye from "./assets/blue-eye.vue";
@@ -231,6 +236,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const store = useEventsStore();
+const sprayingSchedulesStore = useSprayingSchedulesStore();
+
 const eventContainer: Ref<HTMLElement | null> = ref(null);
 const eventSide: Ref<HTMLElement | null> = ref(null);
 const eventList: Ref<HTMLElement | null> = ref(null);
@@ -275,6 +282,7 @@ const openEvtList = () => {
   popupb.value = _bpos.y > _bpar.height * 0.8;
 };
 
+
 // computed on store state
 const calendarEvents = computed<Appointment[]>(() => store.getEvents);
 
@@ -282,26 +290,29 @@ const calendarEvents = computed<Appointment[]>(() => store.getEvents);
 const eventEvents = (): void => {
   const _start = datetime_start.value as Date;
   const _end = datetime_end.value as Date;
-
+  
   RdvsPkg.value = calendarEvents.value.filter((rdv: Appointment) => {
-    const _d = isoStringToDate(rdv.date);
+    const _d = isoStringToDate(rdv.spraying_date);
     return _d >= _start && _d < _end;
   });
 };
 
 const viewEvent = (id: string | number | unknown): void => {
-  const event = new CustomEvent("calendar.request.view", {
-    detail: { id },
-  });
-  document.body.dispatchEvent(event);
+  // const event = new CustomEvent("calendar.request.view", {
+  //   detail: { id },
+  // });
+  // document.body.dispatchEvent(event);
+  router.push("/calendar/"+id)
   closeEventList();
 };
 
 const reportEventFor = (id: string | number | unknown): void => {
-  const event = new CustomEvent("calendar.request.report", {
-    detail: { id },
-  });
-  document.body.dispatchEvent(event);
+  // const event = new CustomEvent("calendar.request.report", {
+  //   detail: { id },
+  // });
+  
+  sprayingSchedulesStore.deleteSprayingScheduleById(id);
+  // document.body.dispatchEvent(event);
   closeEventList();
 };
 

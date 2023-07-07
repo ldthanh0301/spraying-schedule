@@ -1,7 +1,7 @@
 <template>
   <a
     v-if="!directLink"
-    href="#"
+    v-bind:href="'./calendar/'+spraying_id"
     class="underline inline-flex items-center font-medium text-2062F6 text-xs leading-relaxed hover:opacity-80 active:animate-pulse"
     @click.prevent.stop="$emit('clicked')"
   >
@@ -22,7 +22,7 @@
   <!-- v-else -->
   <a
     v-else
-    href="#"
+    v-bind:href="'./'+spraying_id"
     class="underline inline-flex items-center font-medium text-2062F6 text-xs leading-relaxed hover:opacity-80 active:animate-pulse"
   >
     <span
@@ -42,6 +42,7 @@ export interface Props {
   text?: string | number;
   directLink?: boolean;
   iconmgl?: number;
+  spraying_id: number | string;
 }
 
 import { computed, useSlots } from "vue";
@@ -50,8 +51,8 @@ const props = withDefaults(defineProps<Props>(), {
   text: "",
   directLink: false,
   iconmgl: 2,
+  spraying_id:0
 });
-
 const slots = useSlots();
 const emit = defineEmits(["clicked"]);
 

@@ -10,5 +10,5 @@ module.exports = function(app) {
     app.use("/api/farmer", farmerRouter);
     app.use("/api/field", fieldRouter);
     app.use("/api/pesticide", pesticideRouter);
-    app.use("/api/sprayingschedule", sprayingscheduleRouter);
+    app.use("/api/spraying-schedule", sprayingscheduleRouter);
 }

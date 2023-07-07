@@ -37,69 +37,41 @@
             <b-form @submit="onSubmitForm" @reset="onReset">
               <b-form-group
                 id="input-group-1"
-                label="Tên chủ ruộng:"
-                label-for="input-1"
-                description="Hãy điền tên chủ ruộng."
+                label="Tên lịch phun:"
+                label-for="spraying_name"
+                description="Hãy điền tên lịch phun."
               >
                 <b-form-input
-                  id="input-1"
-                  v-model="form.name"
+                  id="spraying_name"
+                  v-model="form.spraying_name"
                   type="text"
-                  placeholder="Nhập tên"
-                  required
-                ></b-form-input>
-              </b-form-group>
-              <b-form-group
-                id="input-group-2"
-                label="Nhập địa chỉ phun thuốc:"
-                label-for="input-2"
-                description="Hãy điền địa chỉ."
-              >
-                <b-form-input
-                  id="input-2"
-                  v-model="form.address"
-                  type="text"
-                  placeholder="Nhập địa chỉ"
-                  required
-                ></b-form-input>
-              </b-form-group>
-              <b-form-group
-                id="input-keywords"
-                label="Loại dịch vụ:"
-                label-for="input-keywords"
-                description="Hãy điền loại dịch vụ."
-              >
-                <b-form-input
-                  id="input-keywords"
-                  v-model="form.keywords"
-                  type="text"
-                  placeholder="Nhập loại dịch vụ"
+                  placeholder="Nhập tên lịch phun"
                   required
                 ></b-form-input>
               </b-form-group>
               <b-form-group
                 id="input-comment"
-                label="Nhập bình luận:"
-                label-for="input-comment"
-                description="Hãy điền bình luận."
+                label="Nhập ghi chú:"
+                label-for="spraying_note"
+                description="Hãy điền ghi chú."
               >
                 <b-form-input
-                  id="input-comment"
-                  v-model="form.comment"
+                  id="spraying_note"
+                  v-model="form.spraying_note"
                   type="text"
-                  placeholder="Nhập bình luận"
+                  placeholder="Nhập ghi chú"
                   required
                 ></b-form-input>
               </b-form-group>
               <b-form-group
                 id="input-group-3"
                 label="Chọn ngày phun thuốc:"
-                label-for="input-2"
+                label-for="spraying_date"
                 description="Hãy chọn ngày phun thuốc"
               >
                 <b-form-input
-                  id="input-3"
-                  v-model="form.day"
+                  id="spraying_date"
+                  v-model="form.spraying_date"
                   type="text"
                   placeholder="Hãy chọn ngày"
                   required
@@ -138,22 +110,20 @@ import { DatePicker } from "v-calendar";
 import AddIcon from "./assets/close-icon.vue";
 import CloseIcon from "./assets/close-icon.vue";
 import { useEventsStore } from "../../stores/events";
-import { useFarmersStore } from '../../stores/farmers.ts'
-
-import {useToast} from 'vue-toast-notification';
-const $toast = useToast();
+import { useFarmersStore } from "../../stores/farmers.ts";
+import { useSprayingSchedulesStore } from "../../stores/sprayingSchedules.ts";
 
 export default {
   data() {
     return {
       store: useEventsStore(),
       farmers: useFarmersStore(),
+      sprayingSchedule: useSprayingSchedulesStore(),
       form: {
-        name: "",
-        address: "",
-        comment: "",
-        day: new Date().toISOString(),
         keywords: "",
+        spraying_name:"",
+        spraying_date:new Date().toISOString(),
+        spraying_note:"",
       },
       isOpen: false,
       context: null,
@@ -164,17 +134,16 @@ export default {
 
   computed: {
     isModalVisible() {
-     
       return this.isOpen;
     },
     dates() {
-      return this.form.day;
+      return this.form.spraying_date;
     },
     attributes() {
       return [
         {
           highlight: true,
-          dates: this.form.day,
+          dates: this.form.spraying_date,
         },
       ];
     },
@@ -183,42 +152,42 @@ export default {
   methods: {
     onToggle() {
       this.isOpen = !this.isOpen;
-      console.log("farmers: ", this.farmers.getFarmers())
-      console.log("farmers2: ", this.farmers.farmers)
+      console.log("farmers: ", this.farmers.getFarmers());
+      console.log("farmers2: ", this.farmers.farmers);
     },
     onContext(ctx) {
       this.context = ctx;
     },
     onDayClick(day) {
-      this.form.day = day.date.toISOString();
+      this.form.spraying_date = day.date.toISOString();
     },
     onSubmitForm(event) {
       event.preventDefault();
       this.isOpen = false;
-      this.store.setEvent({
-        id: "cl30h76qi116501nu2dc1wnv1",
-        date: this.form.day,
-        comment: this.comment,
-        keywords: this.form.keywords,
-        name: this.form.name,
+      // this.store.setEvent({
+      //   id: "cl30h76qi116501nu2dc1wnv1",
+      //   date: this.form.day,
+      //   comment: this.comment,
+      //   keywords: this.form.keywords,
+      //   name: this.form.name,
+      // });
+      // this.form.name = "";
+      this.sprayingSchedule.create({
+        spraying_name: this.form.spraying_name,
+        spraying_date: this.form.spraying_date,
+        spraying_note: this.form.spraying_note,
+        spraying_farmer: 1,
+        spraying_field: 1,
       });
-      this.form.name = "";
-
-      this.onReset(event)
-      $toast.open({
-        message:"Thêm lịch thành công",
-        type: "success",
-        position:"top-right"
-      })
+      this.onReset(event);
      
     },
     onReset(event) {
       event.preventDefault();
-      this.form.day = new Date();
-      this.form.name = "";
-      this.form.address= "";
-      this.form.comment= "";
-      this.form.keywords="";
+      this.form.spraying_date = new Date();
+      this.form.spraying_name = "";
+      this.form.spraying_note = "";
+      this.form.keywords = "";
     },
   },
 };

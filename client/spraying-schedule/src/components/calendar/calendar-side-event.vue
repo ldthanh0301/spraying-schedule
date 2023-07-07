@@ -47,30 +47,30 @@
           <div class="w-full flex-shrink more-event-body-item-body">
             <div class="font-semibold text-A1A1AA leading-4 text-0dt688">
               <span
-                :data-event-date="rdv.date"
-                :title="isoStringToDate(rdv.date).toLocaleString($i18n.locale)"
+                :data-event-date="rdv.spraying_date"
+                :title="isoStringToDate(rdv.spraying_date).toLocaleString($i18n.locale)"
                 class="calendar--side-event-time"
               >
                 {{
-                  timeFormat(`${hours(rdv.date)}:${minutes(rdv.date)}`, true)
+                  timeFormat(`${hours(rdv.spraying_date)}:${minutes(rdv.spraying_date)}`, true)
                 }}
-                <!-- {{ hours(rdv.date) }}:{{ minutes(rdv.date) }} -->
+                <!-- {{ hours(rdv.spraying_date) }}:{{ minutes(rdv.spraying_date) }} -->
               </span>
             </div>
             <div
               class="font-medium text-xs text-09101D flex flex-nowrap items-center"
             >
               <span
-                :title="rdv?.comment ?? ''"
+                :title="rdv?.spraying_comment ?? ''"
                 class="block capitalize truncate max-w-50p calendar--side-event-name"
               >
-                {{ rdv.name }}&nbsp;
+                {{ rdv.spraying_name }}&nbsp;
               </span>
               <!---->
               <span
                 class="block text-A1A1AA capitalize truncate calendar--side-event-keyword"
               >
-                {{ rdv.keywords }}
+                {{ rdv.spraying_keywords }}
               </span>
             </div>
           </div>
@@ -110,7 +110,6 @@ const datetime_end: Ref<Date | null> = ref(null);
 
 //events containers
 const RdvsPkg: Ref<Appointment[]> = ref([]);
-
 const store = useEventsStore();
 
 const $t: any = inject("$t");
@@ -124,7 +123,7 @@ const eventEvents = (): void => {
   const end = datetime_end.value as Date;
 
   RdvsPkg.value = calendarEvents.value.filter((rdv: Appointment) => {
-    const d = isoStringToDate(rdv.date);
+    const d = isoStringToDate(rdv.spraying_date);
     return d >= start && d < end;
   });
 };

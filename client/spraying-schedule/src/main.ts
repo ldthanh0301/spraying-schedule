@@ -16,6 +16,11 @@ import { createPinia } from "pinia";
 
 //toast 
 import 'vue-toast-notification/dist/theme-sugar.css';
+
+
+import FutureSlider from 'vue-future-slider'
+import 'vue-future-slider/dist/vue-future-slider.css'
+
 const pinia = createPinia();
 
 
@@ -30,4 +35,6 @@ app.use(ProCalendar);
 app.use(router);
 app.use(BootstrapVue3)
 app.use(VCalendar)
+app.use(FutureSlider);
+
 app.mount("#app");

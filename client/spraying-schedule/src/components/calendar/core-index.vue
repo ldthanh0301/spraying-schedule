@@ -149,6 +149,7 @@ import Search from "./calendar-search.vue";
 import Toggle from "./view-toggle.vue";
 import Loader from "./assets/loader-widget.vue";
 import { useEventsStore } from "../../stores/events";
+import { useSprayingSchedulesStore } from "../../stores/sprayingSchedules";
 import type { Appointment, Configs, T_View } from "../../stores/events";
 
 import MonthView from "./calendar-month-view.vue";
@@ -200,6 +201,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(["calendarClosed", "fetchEvents"]);
 
 const store = useEventsStore();
+const sprayingScheduleStore = useSprayingSchedulesStore();
+// get schedule
+
+sprayingScheduleStore.fetchSprayingSchedule();
+
 
 const propLoading: Ref<boolean> = toRef(props, "loading");
 const leftMenu: Ref<ComponentPublicInstance<T_LeftMenu>> = ref<
@@ -252,7 +258,9 @@ const runSearch = async (value: string): Promise<void> => {
   let _search = [];
   //
   if (!value.replace(/\s/g, "").length) {
-    store.setEvents(props.events);
+     if (props.events){
+       store.setEvents(props.events);
+     }
     return void 0;
   }
   //
@@ -295,7 +303,7 @@ const verifyFirstBind = (): void => {
   }
 
   // events
-  store.setEvents(props.events);
+  // store.setEvents(props.events);
   // config
   store.setConfigs(props.config);
 };
@@ -349,8 +357,10 @@ watch(
  * watch props and set needed in store
  */
 watch(props, () => {
-  store.setEvents(props.events);
-  store.setConfigs(props.config);
+  if (props.events){
+    store.setEvents(props.events);
+    store.setConfigs(props.config);
+  }
 });
 
 onBeforeMount(async () => {
@@ -359,6 +369,8 @@ onBeforeMount(async () => {
 
 onMounted(async () => {
   // verify first bind props: date, events
+  store.fetchEvents()
+
   verifyFirstBind();
 });
 </script>

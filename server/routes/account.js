@@ -2,15 +2,20 @@ const express = require('express')
 const router = express.Router()
 const Account= require("../models/Account")
 const argon2 = require("argon2");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const verifyToken = require('../middlewave/auth');
 
 //@route Get api/account
 //@desc get account
 //@access Private
 
-router.get("/",async (req,res)=>{
-    const account = await Account.findAll()
-    res.json(account);
+router.get("/",verifyToken,async (req,res)=>{
+    console.log("yser: ",req.username)
+    const account = await Account.findByPk(req.username)
+    res.json({
+        account,
+        message:"account info"
+    });
 })
 
 //@route POST api/account
@@ -88,6 +93,7 @@ router.post("/login",async (req,res)=>{
         process.env.ACCESS_TOKEN_SECRET
       );
     res.json({
+        account: accountExist,
         message:"Đăng nhập thành công",
         accessToken
     });
